@@ -1,0 +1,26 @@
+# Build
+build/
+cmake-build-*/
+out/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Compiled
+*.o
+*.obj
+*.exe
+*.out
+*.app
+
+# Images
+*.ppm
+*.png_output/
