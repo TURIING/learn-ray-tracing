@@ -3,6 +3,8 @@ build/
 cmake-build-*/
 out/
 bin/
+compile_commands.json
+.cache/
 
 # IDE
 .vscode/
