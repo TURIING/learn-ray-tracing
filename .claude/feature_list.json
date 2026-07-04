@@ -1,0 +1,12 @@
+{
+  "features": [
+    {
+      "id": "image-class",
+      "name": "Image 类",
+      "description": "实现 Image 类，用于将渲染结果像素输出为 PNG 图片，基于 stb_image_write 库，并引入 gtest 测试框架",
+      "dependencies": ["stb", "googletest"],
+      "status": "completed",
+      "evidence": "10/10 tests pass, verified by init.sh on 2026-07-04"
+    }
+  ]
+}
