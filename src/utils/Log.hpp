@@ -36,38 +36,60 @@ enum class LogLevel {
  */
 class Log {
 public:
+    /** @brief 获取 Log 单例实例 */
     static Log& Instance();
 
+    /**
+     * @brief 初始化异步日志系统
+     *
+     * 创建异步 logger，配置控制台彩色输出、日志格式、日志级别。
+     * 多次调用安全（已初始化时直接返回）。
+     */
     void Init();
+
+    /** @brief 关闭日志系统，刷新并释放所有资源 */
     void Shutdown();
+
+    /** @brief 刷新日志缓冲区，将所有待写入的日志立即输出 */
     void Flush();
+
+    /**
+     * @brief 设置最低输出级别
+     * @param level 低于此级别的日志将被忽略
+     */
     void SetLevel(LogLevel level);
 
+    /** @brief 输出 TRACE 级别日志 */
     template<typename... Args>
     void Trace(fmt::format_string<Args...> fmt, Args&&... args) {
         if (m_pLogger) m_pLogger->trace(fmt, std::forward<Args>(args)...);
     }
 
+    /** @brief 输出 DEBUG 级别日志 */
     template<typename... Args>
     void Debug(fmt::format_string<Args...> fmt, Args&&... args) {
         if (m_pLogger) m_pLogger->debug(fmt, std::forward<Args>(args)...);
     }
 
+    /** @brief 输出 INFO 级别日志 */
     template<typename... Args>
     void Info(fmt::format_string<Args...> fmt, Args&&... args) {
         if (m_pLogger) m_pLogger->info(fmt, std::forward<Args>(args)...);
     }
 
+    /** @brief 输出 WARN 级别日志 */
     template<typename... Args>
     void Warn(fmt::format_string<Args...> fmt, Args&&... args) {
         if (m_pLogger) m_pLogger->warn(fmt, std::forward<Args>(args)...);
     }
 
+    /** @brief 输出 ERROR 级别日志 */
     template<typename... Args>
     void Error(fmt::format_string<Args...> fmt, Args&&... args) {
         if (m_pLogger) m_pLogger->error(fmt, std::forward<Args>(args)...);
     }
 
+    /** @brief 输出 CRITICAL 级别日志 */
     template<typename... Args>
     void Critical(fmt::format_string<Args...> fmt, Args&&... args) {
         if (m_pLogger) m_pLogger->critical(fmt, std::forward<Args>(args)...);

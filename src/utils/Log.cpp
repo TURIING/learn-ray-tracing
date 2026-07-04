@@ -5,21 +5,11 @@
 
 #include <vector>
 
-/**
- * @brief 获取 Log 单例实例
- * @return Log 全局唯一实例的引用
- */
 Log& Log::Instance() {
     static Log instance;
     return instance;
 }
 
-/**
- * @brief 初始化异步日志系统
- *
- * 创建异步 logger，配置控制台彩色输出、日志格式、日志级别。
- * 多次调用安全（已初始化时直接返回）。
- */
 void Log::Init() {
     if (m_pLogger) return;
 
@@ -51,9 +41,6 @@ void Log::Init() {
     spdlog::register_logger(m_pLogger);
 }
 
-/**
- * @brief 关闭日志系统，释放资源
- */
 void Log::Shutdown() {
     if (m_pLogger) {
         m_pLogger->flush();
@@ -63,17 +50,10 @@ void Log::Shutdown() {
     m_pThreadPool.reset();
 }
 
-/**
- * @brief 刷新日志缓冲区，将所有待写入的日志立即输出
- */
 void Log::Flush() {
     if (m_pLogger) m_pLogger->flush();
 }
 
-/**
- * @brief 设置日志级别
- * @param level 最低输出级别（低于此级别的日志将被忽略）
- */
 void Log::SetLevel(LogLevel level) {
     if (!m_pLogger) return;
     m_pLogger->set_level(static_cast<spdlog::level::level_enum>(level));
