@@ -6,8 +6,8 @@
 
 int main() {
     // 图像尺寸
-    const int image_width  = 400;
-    const int image_height = 200;
+    const int image_width  = 800;
+    const int image_height = 400;
 
     Image image(image_width, image_height, 3);
 

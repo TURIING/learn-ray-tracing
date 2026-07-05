@@ -1,20 +1,28 @@
 {
-  "features": [
-    {
-      "id": "image-class",
-      "name": "Image 类",
-      "description": "实现 Image 类，用于将渲染结果像素输出为 PNG 图片，基于 stb_image_write 库，并引入 gtest 测试框架",
-      "dependencies": ["stb", "googletest"],
-      "status": "completed",
-      "evidence": "10/10 tests pass, verified by init.sh on 2026-07-04"
-    },
-    {
-      "id": "sky-background",
-      "name": "天空背景渲染",
-      "description": "实现 Renderer::rayColor 函数，根据光线方向的 y 分量在白色（地平线）和蓝色（天顶）之间渐变，使用 Image 类输出 PNG 图片",
-      "dependencies": ["glm", "image-class", "ray-class"],
-      "status": "completed",
-      "evidence": "21/21 tests pass (6 new Renderer tests), verified by init.sh on 2026-07-04"
-    }
-  ]
+    "features": [
+        {
+            "id": "image-class",
+            "name": "Image 类",
+            "description": "实现 Image 类，用于将渲染结果像素输出为 PNG 图片，基于 stb_image_write 库，并引入 gtest 测试框架",
+            "dependencies": ["stb", "googletest"],
+            "status": "completed",
+            "evidence": "10/10 tests pass, verified by init.sh on 2026-07-04"
+        },
+        {
+            "id": "sky-background",
+            "name": "天空背景渲染",
+            "description": "实现 Renderer::rayColor 函数，根据光线方向的 y 分量在白色（地平线）和蓝色（天顶）之间渐变，使用 Image 类输出 PNG 图片",
+            "dependencies": ["glm", "image-class", "ray-class"],
+            "status": "completed",
+            "evidence": "21/21 tests pass (6 new Renderer tests), verified by init.sh on 2026-07-04"
+        },
+        {
+            "id": "sphere-rendering",
+            "name": "球体渲染",
+            "description": "实现 Renderer::hitSphere 函数检测光线与球体相交，在 rayColor 中优先检测球体命中并返回红色，未命中则回退到天空渐变",
+            "dependencies": ["glm", "ray-class", "sky-background"],
+            "status": "completed",
+            "evidence": "29/29 tests pass (8 new Renderer tests), verified by init.sh on 2026-07-05"
+        }
+    ]
 }

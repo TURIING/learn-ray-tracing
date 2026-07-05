@@ -2,9 +2,9 @@
 
 ## 当前状态
 
-**最后更新：** 2026-07-04
-**会话 ID：** session-2026-07-04
-**当前特性：** sky-background - 天空背景渲染
+**最后更新：** 2026-07-05
+**会话 ID：** session-2026-07-05
+**当前特性：** sphere-rendering - 球体渲染
 
 ## 状态
 
@@ -12,6 +12,7 @@
 
 - [x] Image 类实现 + gtest 测试框架
 - [x] 天空背景渲染 — Renderer::rayColor + main.cpp 集成
+- [x] 球体渲染 — Renderer::hitSphere + rayColor 集成
 
 ### 进行中
 
@@ -33,27 +34,23 @@
 - **gtest**：使用 Google Test 作为测试框架
   - 背景：业界标准 C++ 测试框架，CMake 原生集成（CTest + gtest_discover_tests）
   - 考虑过的替代方案：Catch2, doctest
+- **hitSphere 不检查 t > 0**：当前实现与参考代码一致，仅通过 discriminant > 0 判断直线相交，不区分交点在光线前方还是后方。这是有意为之，后续章节会引入 t 范围限制
 
 ## 本次会话修改的文件
 
-### 编译修复
-- `CMakeLists.txt` — 修复 GLOB_RECURSE 范围（src/ 替代根目录）；提取 raytracer_lib 静态库统一管理依赖和 include 路径
-- `tests/CMakeLists.txt` — 链接 raytracer_lib 替代不存在的 image 库
-
-### 天空背景渲染
-- `src/core/Renderer.h` — 新增 Renderer 类声明，包含 rayColor 静态方法
-- `src/core/Renderer.cpp` — 新增 rayColor 实现：基于光线方向 y 分量的蓝白渐变
-- `src/main.cpp` — 新增渲染循环：遍历像素、生成光线、计算颜色、输出 PNG
-- `tests/test_renderer.cpp` — 新增 6 个 Renderer 单元测试
-- `.claude/feature_list.json` — 添加 sky-background 特性
+### 球体渲染
+- `src/core/Renderer.h` — 添加 hitSphere 静态方法声明，更新类和 rayColor 注释
+- `src/core/Renderer.cpp` — 实现 hitSphere（判别式法），修改 rayColor 优先检测球体命中
+- `tests/test_renderer.cpp` — 新增 8 个测试（5 个 hitSphere 单元测试 + 3 个 rayColor 集成测试）
+- `.claude/feature_list.json` — 添加 sphere-rendering 特性
 - `.claude/progress.md` — 本日志
 
 ## 完成证据
 
 - [x] 编译通过：cmake --build . 成功
-- [x] 21/21 测试通过：ctest --output-on-failure
+- [x] 29/29 测试通过：ctest --output-on-failure
 - [x] init.sh 完整验证通过
-- [x] 程序输出 output.png (400x200 天空渐变图片)
+- [x] 程序输出 output.png (400x200，中央红色球体 + 天空渐变背景)
 
 ## 下次会话备忘
 
