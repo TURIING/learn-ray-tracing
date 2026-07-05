@@ -18,11 +18,11 @@
         },
         {
             "id": "sphere-rendering",
-            "name": "球体渲染",
-            "description": "实现 Renderer::hitSphere 函数检测光线与球体相交，在 rayColor 中优先检测球体命中并返回红色，未命中则回退到天空渐变",
+            "name": "球体渲染与法线可视化",
+            "description": "实现 Renderer::hitSphere（布尔版）和 hitSphereT（t值版）检测光线与球体相交，rayColor 通过表面法线计算颜色实现法线可视化：color = 0.5*(N+1.0)，未命中回退到天空渐变",
             "dependencies": ["glm", "ray-class", "sky-background"],
             "status": "completed",
-            "evidence": "29/29 tests pass (8 new Renderer tests), verified by init.sh on 2026-07-05"
+            "evidence": "34/34 tests pass (13 new Renderer tests), verified by init.sh on 2026-07-05"
         }
     ]
 }

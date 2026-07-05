@@ -140,18 +140,74 @@ TEST_F(RendererTest, HitSphereLineIntersectsButBehindRay)
 }
 
 // ============================================================
-// rayColor 球体集成测试
+// hitSphereT 单元测试
 // ============================================================
 
-TEST_F(RendererTest, RayColorSphereHitReturnsRed)
+TEST_F(RendererTest, HitSphereTCenter)
 {
-    // 光线击中球体，应返回红色
+    // 光线从原点指向球心 (0, 0, -1)，半径 0.5
+    // t = 0.5 (交点在 z=-0.5)
+    Ray r(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+    float t = Renderer::hitSphereT(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, r);
+    EXPECT_NEAR(t, 0.5f, kEpsilon);
+}
+
+TEST_F(RendererTest, HitSphereTMiss)
+{
+    // 光线未击中球体，应返回 -1.0
+    Ray r(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    float t = Renderer::hitSphereT(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, r);
+    EXPECT_LT(t, 0.0f);
+}
+
+TEST_F(RendererTest, HitSphereTInside)
+{
+    // 光线起点在球体内部（球心），最近交点在射线后方
+    // 前方交点 t=0.5 需要通过 (-b + sqrt(discriminant)) / (2a) 获得
+    Ray r(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    float t = Renderer::hitSphereT(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, r);
+    EXPECT_LT(t, 0.0f); // 最近根在后方
+}
+
+TEST_F(RendererTest, HitSphereTBehindRay)
+{
+    // 球体在射线后方，返回负 t（交点在光线反方向）
+    Ray r(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+    float t = Renderer::hitSphereT(glm::vec3(0.0f, 0.0f, 1.0f), 0.5f, r);
+    EXPECT_LT(t, 0.0f);
+}
+
+// ============================================================
+// rayColor 球体法线可视化集成测试
+// ============================================================
+
+TEST_F(RendererTest, RayColorSphereCenterReturnsFrontNormal)
+{
+    // 光线从原点指向球心，命中点法线为 (0, 0, 1)，颜色 = 0.5*(1, 1, 2) = (0.5, 0.5, 1.0)
     Ray r(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
     glm::vec3 color = Renderer::rayColor(r);
 
-    EXPECT_NEAR(color.r, 1.0f, kEpsilon);
-    EXPECT_NEAR(color.g, 0.0f, kEpsilon);
-    EXPECT_NEAR(color.b, 0.0f, kEpsilon);
+    EXPECT_NEAR(color.r, 0.5f, kEpsilon);
+    EXPECT_NEAR(color.g, 0.5f, kEpsilon);
+    EXPECT_NEAR(color.b, 1.0f, kEpsilon);
+}
+
+TEST_F(RendererTest, RayColorSphereNormalColorInRange)
+{
+    // 验证法线可视化颜色分量始终在 [0, 1] 范围内
+    // 扫描球体上方区域的多条光线
+    for (int i = 0; i <= 10; ++i) {
+        float u = -0.5f + 0.1f * static_cast<float>(i); // x: -0.5 ~ 0.5
+        Ray r(glm::vec3(u, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+        glm::vec3 color = Renderer::rayColor(r);
+
+        EXPECT_GE(color.r, 0.0f);
+        EXPECT_LE(color.r, 1.0f);
+        EXPECT_GE(color.g, 0.0f);
+        EXPECT_LE(color.g, 1.0f);
+        EXPECT_GE(color.b, 0.0f);
+        EXPECT_LE(color.b, 1.0f);
+    }
 }
 
 TEST_F(RendererTest, RayColorSphereMissReturnsSky)
@@ -160,7 +216,6 @@ TEST_F(RendererTest, RayColorSphereMissReturnsSky)
     Ray r(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::vec3 color = Renderer::rayColor(r);
 
-    // 直指上方应返回蓝色天空
     EXPECT_NEAR(color.r, 0.5f, kEpsilon);
     EXPECT_NEAR(color.g, 0.7f, kEpsilon);
     EXPECT_NEAR(color.b, 1.0f, kEpsilon);
@@ -169,7 +224,6 @@ TEST_F(RendererTest, RayColorSphereMissReturnsSky)
 TEST_F(RendererTest, RayColorExistingSkyTestsUnaffected)
 {
     // 验证原有天空测试光线不命中球体，行为不变
-    // 使用水平方向，原测试期望混合色仍成立
     Ray r(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     glm::vec3 color = Renderer::rayColor(r);
 
