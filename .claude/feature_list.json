@@ -23,6 +23,14 @@
             "dependencies": ["glm", "ray-class", "sky-background"],
             "status": "completed",
             "evidence": "34/34 tests pass (13 new Renderer tests), verified by init.sh on 2026-07-05"
+        },
+        {
+            "id": "hittable-interface",
+            "name": "抽象 Hittable 接口与 Sphere 实现",
+            "description": "实现 Hittable 抽象基类（virtual hit 方法）和 HitRecord 结构体，Sphere 作为首个具体 Hittable 实现，Renderer::rayColor 新增接受 const Hittable& 的重载保持向后兼容，main.cpp 使用新接口",
+            "dependencies": ["glm", "ray-class", "sphere-rendering"],
+            "status": "completed",
+            "evidence": "45/45 tests pass (11 new Sphere tests), verified by init.sh on 2026-07-05"
         }
     ]
 }

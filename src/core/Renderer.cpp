@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include <cmath>
+#include <limits>
 
 bool Renderer::hitSphere(const glm::vec3& center, float radius, const Ray& r)
 {
@@ -42,5 +43,14 @@ glm::vec3 Renderer::rayColor(const Ray& r)
         return 0.5f * glm::vec3(N.x + 1.0f, N.y + 1.0f, N.z + 1.0f);
     }
 
+    return background(r);
+}
+
+glm::vec3 Renderer::rayColor(const Ray& r, const Hittable& world)
+{
+    HitRecord rec;
+    if (world.hit(r, 0.0f, std::numeric_limits<float>::max(), rec)) {
+        return 0.5f * glm::vec3(rec.normal.x + 1.0f, rec.normal.y + 1.0f, rec.normal.z + 1.0f);
+    }
     return background(r);
 }

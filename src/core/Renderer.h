@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Ray.h"
+#include "Hittable.h"
 #include <glm/glm.hpp>
 
 /**
@@ -61,4 +62,16 @@ public:
      * @return 像素颜色（线性空间，分量范围 [0, 1]）
      */
     static glm::vec3 rayColor(const Ray& r);
+
+    /**
+     * @brief 根据光线和场景计算像素颜色（泛化版本）
+     *
+     * 使用 Hittable 接口检测场景中物体的相交，命中则通过表面法线计算颜色；
+     * 未命中则回退到天空背景。
+     *
+     * @param r 从相机发出的光线
+     * @param world 场景中的可击中物体
+     * @return 像素颜色（线性空间，分量范围 [0, 1]）
+     */
+    static glm::vec3 rayColor(const Ray& r, const Hittable& world);
 };

@@ -1,5 +1,6 @@
 #include "core/Renderer.h"
 #include "core/Ray.h"
+#include "core/Sphere.h"
 #include "utils/Image.h"
 #include <glm/glm.hpp>
 #include <iostream>
@@ -10,6 +11,9 @@ int main() {
     const int image_height = 400;
 
     Image image(image_width, image_height, 3);
+
+    // 场景：球体
+    Sphere sphere(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f);
 
     // 视口参数（虚拟成像平面）
     // 光线方程: P(t) = origin + t * direction
@@ -32,7 +36,7 @@ int main() {
             Ray r(origin, lower_left_corner + u * horizontal + v * vertical);
 
             // 计算颜色
-            glm::vec3 color = Renderer::rayColor(r);
+            glm::vec3 color = Renderer::rayColor(r, sphere);
 
             // 将线性颜色 [0,1] 转换为 [0,255] 并写入图像
             int ir = static_cast<int>(255.99f * color.r);
