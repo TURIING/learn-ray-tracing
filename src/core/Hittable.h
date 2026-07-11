@@ -8,13 +8,30 @@
  *
  * 当 Hittable::hit 返回 true 时，此结构体包含：
  * - 交点坐标 p
- * - 交点处的表面法线 normal（单位向量，指向外侧）
+ * - 交点处的表面法线 normal（单位向量，始终指向光源侧）
  * - 光线参数 t（交点沿光线的距离）
+ * - 击中面方向 frontFace（true = 正面/外侧，false = 背面/内侧）
  */
 struct HitRecord {
-    glm::vec3 p;       ///< 交点坐标
-    glm::vec3 normal;  ///< 表面法线（单位向量）
-    float t;           ///< 光线参数
+    glm::vec3 p;            ///< 交点坐标
+    glm::vec3 normal;       ///< 表面法线（单位向量，指向光源侧）
+    float t;                ///< 光线参数
+    bool frontFace;         ///< 击中面方向（true=正面，false=背面）
+
+    /**
+     * @brief 根据光线方向和几何外法线设置法线朝向
+     *
+     * 始终使法线指向光线来源方向（光源侧）：
+     * - dot(rayDir, outwardNormal) < 0 → 正面击中 → normal = outwardNormal
+     * - dot(rayDir, outwardNormal) >= 0 → 背面击中 → normal = -outwardNormal
+     *
+     * @param r 入射光线
+     * @param outwardNormal 几何外法线（单位向量）
+     */
+    inline void setFaceNormal(const Ray& r, const glm::vec3& outwardNormal) {
+        frontFace = glm::dot(r.direction(), outwardNormal) < 0.0f;
+        normal = frontFace ? outwardNormal : -outwardNormal;
+    }
 };
 
 /**

@@ -63,8 +63,9 @@ TEST_F(SphereTest, InsideReturnsExitPoint)
 
     EXPECT_TRUE(sphere.hit(r, 0.0f, 1000.0f, rec));
     EXPECT_NEAR(rec.t, 0.5f, kEpsilon);
-    // 出口点法线仍指向外侧 (0,0,1)
-    EXPECT_NEAR(rec.normal.z, 1.0f, kEpsilon);
+    // 背面击中：光线从球心内部向外射出，法线指向光源侧（球内）
+    EXPECT_FALSE(rec.frontFace);
+    EXPECT_NEAR(rec.normal.z, -1.0f, kEpsilon);
 }
 
 TEST_F(SphereTest, InsideOffCenter)
