@@ -1,9 +1,11 @@
 #include "core/Renderer.h"
 #include "core/Ray.h"
 #include "core/Sphere.h"
+#include "core/HittableList.h"
 #include "utils/Image.h"
 #include <glm/glm.hpp>
 #include <iostream>
+#include <memory>
 
 int main() {
     // 图像尺寸
@@ -12,8 +14,10 @@ int main() {
 
     Image image(image_width, image_height, 3);
 
-    // 场景：球体
-    Sphere sphere(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f);
+    // 场景：多物体
+    HittableList world;
+    world.add(std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f));    // 主体球
+    world.add(std::make_shared<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f)); // 大地平面球
 
     // 视口参数（虚拟成像平面）
     // 光线方程: P(t) = origin + t * direction
@@ -36,7 +40,7 @@ int main() {
             Ray r(origin, lower_left_corner + u * horizontal + v * vertical);
 
             // 计算颜色
-            glm::vec3 color = Renderer::rayColor(r, sphere);
+            glm::vec3 color = Renderer::rayColor(r, world);
 
             // 将线性颜色 [0,1] 转换为 [0,255] 并写入图像
             int ir = static_cast<int>(255.99f * color.r);
