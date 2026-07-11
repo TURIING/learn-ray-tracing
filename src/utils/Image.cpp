@@ -46,6 +46,16 @@ void Image::setPixel(int x, int y, unsigned char r, unsigned char g, unsigned ch
     m_data[idx + 3] = a;
 }
 
+void Image::setPixel(int x, int y, const glm::vec3& color)
+{
+    int ir = static_cast<int>(255.99f * color.r);
+    int ig = static_cast<int>(255.99f * color.g);
+    int ib = static_cast<int>(255.99f * color.b);
+    setPixel(x, y, static_cast<unsigned char>(ir),
+             static_cast<unsigned char>(ig),
+             static_cast<unsigned char>(ib));
+}
+
 void Image::getPixel(int x, int y, unsigned char& r, unsigned char& g, unsigned char& b) const
 {
     size_t idx = pixelIndex(x, y);

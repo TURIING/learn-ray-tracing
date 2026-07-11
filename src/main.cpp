@@ -2,65 +2,67 @@
 #include "core/Ray.h"
 #include "core/Sphere.h"
 #include "core/HittableList.h"
+#include "core/Camera.h"
 #include "utils/Image.h"
+#include "utils/Log.hpp"
+#include "utils/Random.h"
 #include <glm/glm.hpp>
-#include <iostream>
+#include <glm/gtc/constants.hpp>
 #include <memory>
 
 int main() {
-    // 图像尺寸
-    const int image_width  = 800;
-    const int image_height = 400;
+    Log::Instance().Init();
 
-    Image image(image_width, image_height, 3);
+    // 图像尺寸
+    const int imageWidth  = 800;
+    const int imageHeight = 400;
+
+    Image image(imageWidth, imageHeight, 3);
 
     // 场景：多物体
     HittableList world;
     world.add(std::make_shared<Sphere>(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f));    // 主体球
     world.add(std::make_shared<Sphere>(glm::vec3(0.0f, -100.5f, -1.0f), 100.0f)); // 大地平面球
 
-    // 视口参数（虚拟成像平面）
-    // 光线方程: P(t) = origin + t * direction
-    // 其中 direction = lower_left_corner + u*horizontal + v*vertical
-    const glm::vec3 lower_left_corner(-2.0f, -1.0f, -1.0f); // 视口左下角
-    const glm::vec3 horizontal(4.0f, 0.0f, 0.0f);            // 视口水平跨度（从左到右）
-    const glm::vec3 vertical(0.0f, 2.0f, 0.0f);              // 视口垂直跨度（从下到上）
-    const glm::vec3 origin(0.0f, 0.0f, 0.0f);                // 相机/眼睛位置（光线起点）
+    // 相机
+    Camera camera;
 
-    for (int j = 0; j < image_height; ++j) {
-        std::cerr << "\rScanlines remaining: " << (image_height - 1 - j) << ' ' << std::flush;
-        for (int i = 0; i < image_width; ++i) {
-            // 计算像素中心的 uv 坐标
-            // j=0 对应图片顶部 → v 接近 1.0 → 天空
-            // j=height-1 对应图片底部 → v 接近 0.0 → 地平线
-            auto u = static_cast<float>(i) / static_cast<float>(image_width);
-            auto v = static_cast<float>(image_height - 1 - j) / static_cast<float>(image_height);
+    // 抗锯齿采样数
+    constexpr int kSamplesPerPixel = 100;
 
-            // 生成光线
-            Ray r(origin, lower_left_corner + u * horizontal + v * vertical);
+    LOG_INFO("Starting render: {}x{} with {} samples per pixel", imageWidth, imageHeight, kSamplesPerPixel);
 
-            // 计算颜色
-            glm::vec3 color = Renderer::rayColor(r, world);
+    for (int j = 0; j < imageHeight; ++j) {
+        LOG_INFO("Scanlines remaining: {}", imageHeight - 1 - j);
+        for (int i = 0; i < imageWidth; ++i) {
+            glm::vec3 color(0.0f);
+            for (int s = 0; s < kSamplesPerPixel; ++s) {
+                // 子像素随机抖动：在像素范围内随机偏移
+                auto u = (static_cast<float>(i) + RandomFloat()) / static_cast<float>(imageWidth);
+                auto v = (static_cast<float>(imageHeight - 1 - j) + RandomFloat()) / static_cast<float>(imageHeight);
+                Ray r = camera.GetRay(u, v);
+                color += Renderer::rayColor(r, world);
+            }
+            color /= static_cast<float>(kSamplesPerPixel);
 
-            // 将线性颜色 [0,1] 转换为 [0,255] 并写入图像
-            int ir = static_cast<int>(255.99f * color.r);
-            int ig = static_cast<int>(255.99f * color.g);
-            int ib = static_cast<int>(255.99f * color.b);
-            image.setPixel(i, j, static_cast<unsigned char>(ir),
-                           static_cast<unsigned char>(ig),
-                           static_cast<unsigned char>(ib));
+            // 钳位防止浮点溢出
+            color = glm::clamp(color, 0.0f, 1.0f);
+
+            image.setPixel(i, j, color);
         }
     }
 
-    std::cerr << "\nDone.\n";
+    LOG_INFO("Done.");
 
     // 保存为 PNG 文件
     if (image.save("output.png")) {
-        std::cout << "Image saved to output.png" << std::endl;
+        LOG_INFO("Image saved to output.png");
     } else {
-        std::cerr << "Failed to save image!" << std::endl;
+        LOG_ERROR("Failed to save image!");
+        Log::Instance().Shutdown();
         return 1;
     }
 
+    Log::Instance().Shutdown();
     return 0;
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include <string>
 #include <vector>
 
@@ -9,6 +10,7 @@ public:
 
     void setPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b);
     void setPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+    void setPixel(int x, int y, const glm::vec3& color);
 
     void getPixel(int x, int y, unsigned char& r, unsigned char& g, unsigned char& b) const;
     void getPixel(int x, int y, unsigned char& r, unsigned char& g, unsigned char& b, unsigned char& a) const;
